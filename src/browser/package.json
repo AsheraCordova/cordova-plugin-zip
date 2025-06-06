@@ -1,0 +1,17 @@
+{
+    "name": "cordova-plugin-zip",
+    "version": "3.2.0",
+    "description": "Unzips zip files",
+    "author": "",
+    "license": "BSD",
+    "scripts": {
+        "build" : "npx tsc -noEmit && npx esbuild ZipProxy.ts  --bundle --outfile=ZipProxy.js --external:cordova/exec/proxy  --format=cjs --target=es6 --minify"
+    },
+    "devDependencies": {
+        "esbuild": "^0.25.4",
+        "typescript": "^3.9.5"
+    },
+    "dependencies": {
+        "@zip.js/zip.js": "^2.7.61"
+    }
+}

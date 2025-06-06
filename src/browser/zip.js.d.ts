@@ -35,11 +35,12 @@ declare namespace zip {
 		constructor(url: string);
 	}
 
-	export function createReader(reader: zip.Reader, callback: (zipReader: ZipReader) => void, onerror?: (error: any) => void): void;
+	//export function createReader(reader: zip.Reader, callback: (zipReader: ZipReader) => void, onerror?: (error: any) => void): void;
 
 	export class ZipReader {
-		getEntries(callback: (entries: zip.Entry[]) => void): void;
-		close(callback?: () => void): void;
+		constructor(blobReader: BlobReader);
+		getEntries(): Promise<zip.Entry[]>;
+		close(): Promise<void>;
 	}
 
 	export interface Entry {
@@ -52,7 +53,8 @@ declare namespace zip {
 		comment: string;
 		crc32: number;
 
-		getData(writer: zip.Writer, onend: (result: any) => void, onprogress?: (progress: number, total: number) => void, checkCrc32?: boolean): void;
+		//, onend: (result: any) => void, onprogress?: (progress: number, total: number) => void, checkCrc32?: boolean
+		getData(writer: zip.Writer): Promise<any>;
 	}
 
 	export class Writer {
@@ -66,7 +68,7 @@ declare namespace zip {
 	}
 
 	export class BlobWriter extends Writer {
-		constructor(contentType: string);
+		//constructor(contentType: string);
 	}
 
 	export class FileWriter extends Writer {
