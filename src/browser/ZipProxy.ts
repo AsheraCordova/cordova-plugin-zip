@@ -329,30 +329,18 @@ async function unzipEntry(entry: zipjs.Entry, outputDirectoryEntry: DirectoryEnt
             outputDirectoryEntry.getFile(entry.filename, { create: true, exclusive: false }, resolve, reject);
         });
         logDebug('adding file (write file): ' + entry.filename);
-        let data = await entry.getData(new zipjs.BlobWriter());//new zip.FileWriter(targetFileEntry));
-        /*await new Promise((resolve, reject) => {
-            , resolve, (progress, total) => {
-                logDebug(`${entry.filename}: ${progress} / ${total}`);
-            });
-        });*/
+        let data = await entry.getData(new zipjs.BlobWriter());
 
         await writeBlobToFile(targetFileEntry, data);
-        
+
         logDebug('added file: ' + entry.filename);
         const file: any = await getFileFromEntry(targetFileEntry);
-        const url = URL.createObjectURL(file);
-        let nativeUrl = targetFileEntry.toNativeURL();
-        nativeUrl = nativeUrl.substring(nativeUrl.indexOf("persistent/"));
-        localStorage.setItem(nativeUrl, url);
-        if (nativeUrl.endsWith(".9.png")) {
-            const img: any = await loadImage(url);
-            document.body.appendChild(img);  // or set it elsewhere
-        }
 
-        if (nativeUrl.endsWith("ttf") || nativeUrl.endsWith("otf")) {
-            await loadFont(nativeUrl.replaceAll('/', '_').replaceAll('%20', '_').replaceAll('.', '_'),
-                localStorage.getItem(nativeUrl));
-        }
+        let unZipEvent: any = document.createEvent("Event");
+        unZipEvent.initEvent("UNZIP_fileentry", false, false);
+        unZipEvent.name = "UNZIP_fileentry";
+        unZipEvent.data = { "file" : file, "targetFileEntry" : targetFileEntry };
+        document.dispatchEvent(unZipEvent);
     }
 }
 
@@ -362,47 +350,47 @@ async function loadFont(name: string, url: string | null) {
     await font.load();             // Wait until font is downloaded and parsed
     (document as any).fonts.add(font);     // Add to document so it can be used
     console.log(`Font ${name} loaded`);
-  }
+}
 function loadImage(url: any) {
     return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);     // ✅ resolve with the image element
-      img.onerror = (err) => reject(err);  // ❌ reject on error
-      img.src = url;
-      img.id = url;
-      img.style.visibility = "hidden";
+        const img = new Image();
+        img.onload = () => resolve(img);     // ✅ resolve with the image element
+        img.onerror = (err) => reject(err);  // ❌ reject on error
+        img.src = url;
+        img.id = url;
+        img.style.visibility = "hidden";
     });
-  }
+}
 
 function getFileFromEntry(fileEntry: any) {
     return new Promise((resolve, reject) => {
-      fileEntry.file(resolve, reject);
+        fileEntry.file(resolve, reject);
     });
-  }
+}
 
 function createFileWriterAsync(fileEntry: any) {
     return new Promise((resolve, reject) => {
-      fileEntry.createWriter(writer => {
-        resolve(writer);
-      }, reject);
+        fileEntry.createWriter(writer => {
+            resolve(writer);
+        }, reject);
     });
-  }
-  async function writeBlobToFile(fileEntry: any, blob: any) {
+}
+async function writeBlobToFile(fileEntry: any, blob: any) {
     const writer: any = await createFileWriterAsync(fileEntry);
-  
+
     return new Promise((resolve, reject) => {
-      writer.onwriteend = () => {
-        console.log("Write complete.");
-        resolve("");
-      };
-      writer.onerror = (e) => {
-        console.error("Write failed:", e);
-        reject(e);
-      };
-  
-      writer.write(blob);
+        writer.onwriteend = () => {
+            console.log("Write complete.");
+            resolve("");
+        };
+        writer.onerror = (e) => {
+            console.error("Write failed:", e);
+            reject(e);
+        };
+
+        writer.write(blob);
     });
-  }
+}
 
 interface SuccessCallback {
     (event: { loaded?: number, total: number }, options?): void;
