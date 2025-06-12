@@ -36,6 +36,16 @@
     </config-file>
   </platform>
 
+  <platform name="swt">
+    <source-file src="src/swt/Zip.java" target-dir="src/org/apache/cordova" />
+
+    <config-file target="res/xml/config.xml" parent="/widget">
+      <feature name="Zip">
+        <param name="android-package" value="org.apache.cordova.Zip"/>
+      </feature>
+    </config-file>
+  </platform>
+
   <platform name="ios">
     <source-file src="src/ios/ZipPlugin.m" />
     <header-file src="src/ios/ZipPlugin.h" />
